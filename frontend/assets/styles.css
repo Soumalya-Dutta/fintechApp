@@ -61,6 +61,12 @@ body::after{
 	pointer-events:none;
 }
 
+main{
+	max-width:1200px;
+	margin:0 auto;
+	padding:16px;
+}
+
 header{
 	position: sticky;
 	top: 0;
