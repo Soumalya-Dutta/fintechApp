@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Transaction History — FintechApp</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .txn-hero{background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);color:#fff;padding:30px;border-radius:12px;margin-bottom:24px;text-align:center}
+    .txn-hero h1{color:#fff;margin:0 0 8px}
+    .txn-hero p{margin:0;color:rgba(255,255,255,0.9)}
+    .filters{background:#1a1a1a;padding:20px;border-radius:12px;margin-bottom:20px;box-shadow:var(--shadow);display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+    .filters label{margin:0;display:flex;flex-direction:column;gap:8px;color:#ffffff;font-weight:500}
+    .filters input{width:200px;padding:10px;border:2px solid #380356;border-radius:6px;background:#2a2a2a;color:#ffffff}
+    .filters select{width:200px;padding:10px;border:2px solid #380356;border-radius:6px;background:#2a2a2a;color:#ffffff}
+    .filters input::placeholder{color:#888888}
+    .filters input:focus, .filters select:focus{outline:none;border-color:#b000b2;box-shadow:0 0 0 3px rgba(176, 0, 178, 0.1)}
+    .filters button{padding:10px 20px;background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600}
+    .table{width:100%;border-collapse:collapse;background:#1a1a1a;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+    .table th{background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);color:#fff;padding:14px;text-align:left;font-weight:600}
+    .table td{padding:12px 14px;border-bottom:1px solid #380356;color:#aaaaaa}
+    .table tr:hover{background:#2a2a2a}
+    .table a{color:#b000b2;text-decoration:none;font-weight:500}
+    .table a:hover{text-decoration:underline}
+    .success{color:#10B981;font-weight:600;background:#D1FAE5;padding:4px 8px;border-radius:4px;display:inline-block}
+    .pending{color:#D97706;font-weight:600;background:#FEF3C7;padding:4px 8px;border-radius:4px;display:inline-block}
+    .failed{color:#EF4444;font-weight:600;background:#FEE2E2;padding:4px 8px;border-radius:4px;display:inline-block}
+    .back-nav{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+    .nav-link{display:inline-block;padding:10px 16px;background:#93009c;color:#fff;text-decoration:none;border-radius:8px;font-weight:500;transition:all 0.3s}
+    .nav-link:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+    .nav-link.secondary{background:#380356}
+    #message{padding:12px;border-radius:8px;display:none;margin-bottom:16px}
+    #message.success{background:#D1FAE5;color:#10B981;border-left:4px solid #10B981;display:block}
+    #message.error{background:#FEE2E2;color:#EF4444;border-left:4px solid #EF4444;display:block}
+    .balance-section{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-bottom:24px}
+    .balance-card{background:linear-gradient(135deg, #b000b2 0%, #93009c 100%);color:#fff;padding:24px;border-radius:12px;box-shadow:var(--shadow-lg);text-align:center}
+    .balance-card h3{margin:0 0 8px;font-size:0.95em;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px}
+    .balance-card .amount{font-size:2.5em;font-weight:700;font-family:monospace}
+    .balance-card .currency{font-size:1.2em;opacity:0.95}
+    .refresh-btn{background:#93009c;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.9em;font-weight:500;margin-top:12px;transition:all 0.3s}
+    .refresh-btn:hover{transform:scale(1.05);box-shadow:var(--shadow)}
+  </style>
+</head>
+<body>
+  <header>
+    <div style="text-align:center;padding:8px 16px;">
+      <h1 style="margin:0;font-size:1.3em;font-weight:700;color:#fff;">FintechApp</h1>
+    </div>
+  </header>
+
+  <main style="margin-top: 40px;">
+    <div class="txn-hero">
+      <h1>Transaction History</h1>
+      <p>View and track all your transactions</p>
+    </div>
+
+    <div id="message"></div>
+    
+    <!-- Wallet Balance Section -->
+    <div class="balance-section">
+      <div class="balance-card">
+        <h3>Wallet Balance</h3>
+        <div class="amount" id="walletBalance">₹ 0.00</div>
+        <button class="refresh-btn" onclick="loadWalletBalance()">Refresh Balance</button>
+      </div>
+    </div>
+
+    <div class="filters">
+      <label>Search
+        <input type="search" id="searchInput" placeholder="Txn ID, name, phone">
+      </label>
+      <label>Status
+        <select id="statusFilter">
+          <option value="">All Status</option>
+          <option value="success">✓ Success</option>
+          <option value="pending">⏳ Pending</option>
+          <option value="failed">✗ Failed</option>
+        </select>
+      </label>
+      <button onclick="loadTransactions()">Apply Filter</button>
+    </div>
+
+    <table class="table">
+      <thead><tr><th>Transaction ID</th><th>From</th><th>To</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+      <tbody id="transactionsBody">
+        <tr><td colspan="7" style="text-align:center;padding:20px;">Loading transactions...</td></tr>
+      </tbody>
+    </table>
+
+    <div class="back-nav">
+      <a href="../profile/profile.html" class="nav-link">My Profile</a>
+      <a href="../transfers/transfer.html" class="nav-link secondary">Send Money</a>
+      <a href="../index.html" class="nav-link secondary">Home</a>
+    </div>
+  </main>
+
+  <footer>
+    <small>All transactions are secured and encrypted | <a href="#" style="color:#b000b2;text-decoration:none">Privacy</a></small>
+  <script>
+    const messageDiv = document.getElementById('message');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const transactionsBody = document.getElementById('transactionsBody');
+    const walletBalanceDisplay = document.getElementById('walletBalance');
+
+    async function resolveCurrentUserId() {
+      const storedUserId = localStorage.getItem('userId');
+      if (storedUserId) return storedUserId;
+
+      const identifier = localStorage.getItem('email') || localStorage.getItem('phone');
+      if (!identifier) return null;
+
+      try {
+        const response = await fetch(`/api/auth/profile/${encodeURIComponent(identifier)}`);
+        const data = await response.json();
+        if (response.ok && data.user?.id) {
+          localStorage.setItem('userId', data.user.id);
+          localStorage.setItem('fullname', data.user.fullname || '');
+          localStorage.setItem('email', data.user.email || '');
+          localStorage.setItem('phone', data.user.phone || '');
+          return data.user.id;
+        }
+      } catch (err) {
+        console.log('Could not resolve current user:', err.message);
+      }
+
+      return null;
+    }
+
+    // Load Wallet Balance
+    async function loadWalletBalance() {
+      try {
+        const userId = await resolveCurrentUserId();
+        if (!userId) {
+          walletBalanceDisplay.textContent = '₹ 0.00';
+          return;
+        }
+        
+        try {
+          const response = await fetch(`/api/wallet/balance?userId=${encodeURIComponent(userId)}`);
+          const data = await response.json();
+          if (data.ok && data.balance !== undefined) {
+            const balance = parseFloat(data.balance).toFixed(2);
+            localStorage.setItem('walletBalance', balance);
+            walletBalanceDisplay.textContent = '₹ ' + balance;
+            return;
+          }
+        } catch (apiErr) {
+          console.log('Wallet API unavailable:', apiErr.message);
+        }
+        
+        const storedBalance = localStorage.getItem('walletBalance') || '0.00';
+        walletBalanceDisplay.textContent = '₹ ' + parseFloat(storedBalance).toFixed(2);
+      } catch (err) {
+        console.log('Error loading balance:', err.message);
+        walletBalanceDisplay.textContent = '₹ 0.00';
+      }
+    }
+
+    // Load initial balance on page load
+    window.addEventListener('load', async () => {
+      await loadWalletBalance();
+      await loadTransactions();
+    });
+
+    // Listen for balance updates from other pages (transfer.html)
+    window.addEventListener('walletBalanceUpdated', async () => {
+      await loadWalletBalance();
+    });
+
+    // Auto-refresh balance every 5 seconds
+    setInterval(() => {
+      loadWalletBalance();
+    }, 5000);
+
+    async function loadTransactions() {
+      try {
+        const params = new URLSearchParams();
+        if (searchInput.value) params.append('q', searchInput.value);
+        if (statusFilter.value) params.append('status', statusFilter.value);
+        
+        const response = await fetch(`/api/transactions?${params.toString()}`);
+        const data = await response.json();
+        
+        let transactions = data.ok ? (data.transactions || []) : [];
+        const currentUserId = await resolveCurrentUserId();
+        if (currentUserId && !searchInput.value) {
+          transactions = transactions.filter(t => t.from === currentUserId || t.to === currentUserId);
+        }
+
+        if (transactions.length > 0) {
+          transactionsBody.innerHTML = transactions.map(t => `
+            <tr>
+              <td><a href="receipt.html?id=${t.id}">${t.id}</a></td>
+              <td>${t.from || '-'}</td>
+              <td>${t.to || '-'}</td>
+              <td>₹${parseFloat(t.amount).toFixed(2)}</td>
+              <td class="${t.status}">${t.status.toUpperCase()}</td>
+              <td>${new Date(t.date).toLocaleDateString()}</td>
+              <td><a href="receipt.html?id=${t.id}">View →</a></td>
+            </tr>
+          `).join('');
+        } else {
+          transactionsBody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">No transactions found</td></tr>';
+        }
+      } catch (err) {
+        messageDiv.textContent = ' Error loading transactions: ' + err.message;
+        messageDiv.className = 'error';
+        transactionsBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Error loading data</td></tr>';
+      }
+    }
+
+    loadTransactions();
+  </script>
+</body>
+</html>

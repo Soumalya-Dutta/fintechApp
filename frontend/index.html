@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FintechApp - Modern Payment & Banking Solution</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    header .header-content{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    header .header-title{
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    header h1{
+      margin: 0;
+      font-size: 1.3em;
+    }
+    header p{
+      margin: 0;
+    }
+    header .header-nav{
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    header .nav-btn{
+      padding: 8px 12px;
+      font-size: 0.85em;
+    }
+    .hero{
+      background:linear-gradient(135deg, #93009c 0%, #6b0078 50%, #380356 100%);
+      color:#fff;
+      padding:60px 24px;
+      text-align:center;
+      border-radius:12px;
+      margin:40px auto 40px;
+      max-width:1000px;
+    }
+    .hero h1{color:#fff;font-size:3em;margin-bottom:16px}
+    .hero p{color:rgba(255,255,255,0.9);font-size:1.1em;margin-bottom:32px}
+    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin:40px 0}
+    .feature-card{background:#1a1a1a;padding:24px;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.07);transition:all 0.3s}
+    .feature-card:hover{transform:translateY(-8px);box-shadow:0 20px 25px rgba(0,0,0,0.1)}
+    .feature-card h3{color:#b000b2;margin-top:0}
+    .feature-card p{color:#aaaaaa;font-size:0.95em}
+    .quick-nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+    .nav-btn{padding:16px;background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);color:#fff;text-decoration:none;border-radius:10px;text-align:center;font-weight:600;transition:all 0.3s;border:2px solid transparent}
+    .nav-btn:hover{border-color:#b000b2;transform:scale(1.05)}
+    .nav-btn.secondary{background:linear-gradient(135deg, #380356 0%, #6b0078 100%)}
+    .nav-btn.success{background:linear-gradient(135deg, #10B981 0%, #059669 100%)}
+    .nav-btn.warning{background:linear-gradient(135deg, #b000b2 0%, #93009c 100%)}
+    .slider{
+      width:100%;
+      overflow:hidden;
+      padding:40px 0;
+      background:transparent;
+    }
+    .slide-track{
+      display:flex;
+      animation: scroll 30s linear infinite;
+      will-change: transform;
+    }
+    .slide{
+      width:180px;
+      margin:0 25px;
+      text-align:center;
+      flex-shrink: 0;
+    }
+    .slide img{
+      width:150px;
+      height:150px;
+      border-radius:50%;
+      object-fit:cover;
+      border:4px solid white;
+    }
+    .caption{
+      margin-top:10px;
+      font-size:15px;
+      font-weight:bold;
+    }
+    @keyframes scroll{
+      0%{ transform:translateX(0); }
+      50%{ transform:translateX(calc(-100% / 2)); }
+      100%{ transform:translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="max-width:1200px;margin:0 auto;padding:8px 16px;">
+      <div class="header-content">
+        <div class="header-title">
+          <h1>FintechApp</h1>
+          <p style="margin:0;color:rgba(255,255,255,0.9);font-size:0.75em">Modern Financial Services Platform</p>
+        </div>
+        <div class="header-nav">
+          <a href="auth/login.html" class="nav-btn">Login</a>
+          <a href="auth/register.html" class="nav-btn">Register</a>
+          <a href="profile/profile.html" class="nav-btn secondary">My Profile</a>
+          <a href="kyc/kyc-upload.html" class="nav-btn secondary">KYC</a>
+          <a href="transfers/transfer.html" class="nav-btn success">Send Money</a>
+          <a href="transactions/transactions.html" class="nav-btn success">Transactions</a>
+          <a href="merchant/merchant-onboarding.html" class="nav-btn warning">Merchant</a>
+          <a href="merchant/merchant-dashboard.html" class="nav-btn warning">Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Welcome to FintechApp</h1>
+      <p>Secure, fast, and convenient digital banking and payment solutions</p>
+      <a href="auth/login.html" style="display:inline-block;background:#b000b2;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;transition:all 0.3s">Get Started</a>
+    </section>
+
+    <section class="card">
+      <h2>Key Features</h2>
+      <div class="features">
+        <div class="feature-card">
+          <h3>Secure Authentication</h3>
+          <p>Advanced security with JWT tokens, PIN protection, and OTP verification for your account.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Multi-Method Transfers</h3>
+          <p>Transfer funds via wallet, bank account, or UPI. Fast, secure, and convenient.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Merchant Onboarding</h3>
+          <p>Easy merchant registration with automatic UPI ID generation and payment tracking.</p>
+        </div>
+        <div class="feature-card">
+          <h3>UPI QR Codes</h3>
+          <p>Generate scannable QR codes for instant payments. Compatible with all major UPI apps.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Transaction History</h3>
+          <p>Track all your transactions with detailed receipts and real-time status updates.</p>
+        </div>
+        <div class="feature-card">
+          <h3>KYC Verification</h3>
+          <p>Fast and secure KYC process with document upload and instant verification status.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>About This Platform</h2>
+      <p>FintechApp is a comprehensive financial platform built with modern technologies including Node.js, Express.js, MongoDB, and vanilla JavaScript. It provides a complete ecosystem for user authentication, KYC verification, fund transfers, and merchant management.</p>
+      <p><strong>Current Version:</strong> 1.0.0 | <strong>Status:</strong> Production Ready</p>
+    </section>
+
+    <section class="founders-section" style="background:transparent;color:white;text-align:center;padding:40px 0;margin:40px 0;width:100vw;margin-left:calc(50% - 50vw);">
+      <h2 style="color:white">Founders</h2>
+      <div class="slider">
+        <div class="slide-track">
+          <div class="slide">
+            <img src="photo_assets/sudipta.jpeg">
+            <div class="caption">Sudipta</div>
+          </div>
+          <div class="slide">
+            <img src="photo_assets/sourav.jpeg">
+            <div class="caption">Sourav</div>
+          </div>
+          <div class="slide">
+            <img src="photo_assets/soumalya.jpeg">
+            <div class="caption">Soumalya</div>
+          </div>
+          <div class="slide">
+            <img src="photo_assets\mohit.jpeg">
+            <div class="caption">Mohit</div>
+          </div>
+          <div class="slide">
+            <img src="photo_assets/soham.jpeg">
+            <div class="caption">Soham</div>
+          </div>
+          <div class="slide">
+            <img src="https://picsum.photos/id/1011/300/300">
+            <div class="caption">Somenath</div>
+          </div>
+          <div class="slide">
+            <img src="photo_assets/sudipta.jpeg">
+            <div class="caption">Sudipta</div>
+          </div>
+          <div class="slide">
+            <img src="photo_assets/sourav.jpeg">
+            <div class="caption">Sourav</div>
+          </div>
+          <div class="slide">
+            <img src="photo_assets/soumalya.jpeg">
+            <div class="caption">Soumalya</div>
+          </div>
+          <div class="slide">
+            <img src="photo_assets\mohit.jpeg">
+            <div class="caption">Mohit</div>
+          </div>
+          <div class="slide">
+            <img src="soham.jpeg">
+            <div class="caption">Soham</div>
+          </div>
+          <div class="slide">
+            <img src="https://picsum.photos/id/1011/300/300">
+            <div class="caption">Somenath</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <small>© 2026 FintechApp. All rights reserved. | <a href="#" style="color:#b000b2;text-decoration:none">Privacy Policy</a> | <a href="#" style="color:#b000b2;text-decoration:none">Terms of Service</a></small>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UPI QR Code Generator — FintechApp</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    .qr-hero{background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);color:#fff;padding:30px;border-radius:12px;margin-bottom:24px;text-align:center}
+    .qr-hero h1{color:#fff;margin:0 0 8px}
+    .qr-hero p{margin:0;color:rgba(255,255,255,0.9)}
+    .qr-form-card{background:#1a1a1a;padding:24px;border-radius:12px;margin-bottom:24px;box-shadow:var(--shadow)}
+    .form-section{margin-bottom:24px}
+    .form-section h3{color:#b000b2;margin-top:0;border-bottom:2px solid #380356;padding-bottom:12px}
+    .form-section label{color:#ffffff;display:block;margin:12px 0 6px;font-weight:500}
+    .form-section input{background:#2a2a2a !important;border:2px solid #380356 !important;color:#ffffff !important;padding:12px !important;border-radius:8px !important;font-size:0.95em !important;width:100% !important}
+    .form-section input::placeholder{color:#888888 !important}
+    .form-section input:focus{outline:none !important;border-color:#b000b2 !important;box-shadow:0 0 0 3px rgba(176, 0, 178, 0.1) !important}
+    .form-section button{background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);color:#fff;border:none;padding:12px;margin-top:12px;border-radius:8px;font-weight:600;width:100%;cursor:pointer;transition:all 0.3s}
+    .form-section button:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+    .merchant-info{background:linear-gradient(135deg, #b000b2 0%, #93009c 100%);color:#fff;padding:16px;border-radius:10px;margin-bottom:16px}
+    .merchant-info p{margin:6px 0;color:rgba(255,255,255,0.95)}
+    .merchant-info strong{color:#fff}
+    .qr-display-card{background:#1a1a1a;padding:24px;border-radius:12px;text-align:center;box-shadow:var(--shadow)}
+    .qr-display-card h3{color:#b000b2;margin-top:0}
+    #qrcode{display:inline-block;padding:16px;background:#fff;border:2px solid #380356;border-radius:10px;margin:16px 0}
+    .upi-link-display{background:#2a2a2a;padding:12px;border-radius:8px;margin:16px 0;font-family:monospace;font-size:0.9em;color:#00ff00;word-break:break-all;border-left:4px solid #b000b2;text-shadow:0 0 10px rgba(0,255,0,0.3)}
+    .copy-btn{background:linear-gradient(135deg, #10B981 0%, #059669 100%);color:#fff;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:600;margin-top:12px;transition:all 0.3s}
+    .copy-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+    #message{padding:12px;border-radius:8px;display:none;margin-bottom:16px}
+    #message.success{background:#D1FAE5;color:#10B981;border-left:4px solid #10B981;display:block}
+    #message.error{background:#FEE2E2;color:#EF4444;border-left:4px solid #EF4444;display:block}
+    #message.info{background:#DBEAFE;color:#3B82F6;border-left:4px solid #3B82F6;display:block}
+    .back-nav{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+    .nav-link{display:inline-block;padding:10px 16px;background:#93009c;color:#fff;text-decoration:none;border-radius:8px;font-weight:500;transition:all 0.3s}
+    .nav-link:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+    .nav-link.secondary{background:#380356}
+  </style>
+</head>
+<body>
+  <header>
+    <div style="text-align:center;padding:8px 16px;">
+      <h1 style="margin:0;font-size:1.3em;font-weight:700;color:#fff;">FintechApp</h1>
+    </div>
+  </header>
+
+  <main style="margin-top: 40px;">
+    <div class="qr-hero">
+      <h1>UPI Payment QR Generator</h1>
+      <p>Generate scannable QR codes for instant payments</p>
+    </div>
+
+    <div class="qr-form-card">
+      <div id="message"></div>
+      
+      <div class="form-section">
+        <h3>Merchant Information</h3>
+        <div class="merchant-info" id="merchantInfo" style="display:none;">
+          <p><strong>Merchant Name:</strong> <span id="merchantNameDisplay">-</span></p>
+          <p><strong>Your UPI ID:</strong> <span id="upiIdDisplay" style="font-family:monospace">-</span></p>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Payment Details</h3>
+        <form id="qrForm">
+          <label>UPI ID
+            <input type="text" id="upiInput" name="upi" placeholder="merchant@fintech" required>
+          </label>
+          <label>Payment Amount (₹)
+            <input type="number" id="amountInput" name="amount" placeholder="Enter amount" step="0.01" min="1" required>
+          </label>
+          <button type="submit">Generate QR Code</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="qr-display-card">
+      <h3>Your QR Code</h3>
+      <div id="qrcode"></div>
+      <div id="upiLink" class="upi-link-display" style="display:none"></div>
+      <button class="copy-btn" id="copyBtn" style="display:none;" onclick="copyToClipboard()">📋 Copy UPI Link</button>
+    </div>
+
+    <div class="back-nav">
+      <a href="merchant-dashboard.html" class="nav-link">Back to Dashboard</a>
+      <a href="merchant-onboarding.html" class="nav-link secondary">Onboarding</a>
+      <a href="../index.html" class="nav-link secondary">Home</a>
+    </div>
+  </main>
+
+  <footer>
+    <small>UPI compatible with Google Pay, PhonePe, Paytm, BHIM | <a href="#" style="color:#b000b2;text-decoration:none">Privacy</a></small>
+  </footer>
+
+  <script>
+    const qrForm = document.getElementById('qrForm');
+    const messageDiv = document.getElementById('message');
+    const upiInput = document.getElementById('upiInput');
+    const amountInput = document.getElementById('amountInput');
+    const merchantInfo = document.getElementById('merchantInfo');
+    const merchantNameDisplay = document.getElementById('merchantNameDisplay');
+    const upiIdDisplay = document.getElementById('upiIdDisplay');
+    const upiLinkDiv = document.getElementById('upiLink');
+    const copyBtn = document.getElementById('copyBtn');
+    let currentUPILink = '';
+
+    // Load merchant info from localStorage
+    function loadMerchantInfo() {
+      const merchantName = localStorage.getItem('merchantName');
+      const merchantUPI = localStorage.getItem('merchantUPI');
+      
+      if (merchantName && merchantUPI) {
+        merchantNameDisplay.textContent = merchantName;
+        upiIdDisplay.textContent = merchantUPI;
+        upiInput.value = merchantUPI;
+        merchantInfo.style.display = 'block';
+      }
+    }
+
+    // Generate UPI QR Code
+    function generateUPIQR(upi, amount) {
+      // Clear previous QR
+      document.getElementById('qrcode').innerHTML = '';
+      upiLinkDiv.innerHTML = '';
+      upiLinkDiv.style.display = 'none';
+      
+      if (!upi || !amount) {
+        messageDiv.textContent = 'Please enter UPI ID and amount';
+        messageDiv.className = 'error';
+        return;
+      }
+
+      // Validate UPI format (basic validation)
+      if (!upi.includes('@')) {
+        messageDiv.textContent = 'Invalid UPI ID format. Should be like: merchant@fintech';
+        messageDiv.className = 'error';
+        return;
+      }
+
+      // Create UPI payment link
+      currentUPILink = `upi://pay?pa=${upi}&am=${amount}&cu=INR&tr=FINTECHPAY`;
+      
+      try {
+        // Generate QR Code
+        new QRCode(document.getElementById('qrcode'), {
+          text: currentUPILink,
+          width: 250,
+          height: 250,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        upiLinkDiv.textContent = currentUPILink;
+        upiLinkDiv.style.display = 'block';
+        copyBtn.style.display = 'inline-block';
+        messageDiv.textContent = 'QR Code generated successfully!';
+        messageDiv.className = 'success';
+      } catch (err) {
+        messageDiv.textContent = 'Error generating QR: ' + err.message;
+        messageDiv.className = 'error';
+      }
+    }
+
+    // Copy UPI link to clipboard
+    function copyToClipboard() {
+      navigator.clipboard.writeText(currentUPILink).then(() => {
+        messageDiv.textContent = 'UPI link copied to clipboard!';
+        messageDiv.className = 'success';
+        setTimeout(() => { messageDiv.textContent = ''; }, 2000);
+      }).catch(err => {
+        messageDiv.textContent = 'Failed to copy: ' + err.message;
+        messageDiv.className = 'error';
+      });
+    }
+
+    // Form submission
+    qrForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const upi = upiInput.value.trim();
+      const amount = amountInput.value.trim();
+      generateUPIQR(upi, amount);
+    });
+
+    // Load merchant info on page load
+    loadMerchantInfo();
+  </script>
+</body>
+</html>

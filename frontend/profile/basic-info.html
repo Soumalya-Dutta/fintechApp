@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Basic Information — FintechApp</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .section-card{background:#1a1a1a;padding:24px;border-radius:12px;margin:40px auto 20px;box-shadow:var(--shadow);max-width:700px}
+    .section-card h1{color:#b000b2;margin-top:0;border-bottom:2px solid #380356;padding-bottom:12px}
+    .profile-form{display:grid;gap:16px}
+    #message{padding:12px;border-radius:8px;display:none;margin-bottom:16px}
+    #message.success{background:#D1FAE5;color:#10B981;border-left:4px solid #10B981;display:block}
+    #message.error{background:#FEE2E2;color:#EF4444;border-left:4px solid #EF4444;display:block}
+    #message.info{background:#DBEAFE;color:#3B82F6;border-left:4px solid #3B82F6;display:block}
+    #profileForm label{color:#ffffff !important;display:block !important;margin:12px 0 6px !important;font-weight:500 !important}
+    #profileForm input{background:#2a2a2a !important;border:2px solid #380356 !important;color:#ffffff !important;padding:12px !important;border-radius:8px !important;font-size:0.95em !important;width:100% !important}
+    #profileForm input::placeholder{color:#888888 !important}
+    #profileForm input:focus{outline:none !important;border-color:#b000b2 !important;box-shadow:0 0 0 3px rgba(176, 0, 178, 0.1) !important}
+    .back-link{text-align:center;margin-top:24px}
+    .back-link a{color:#b000b2;text-decoration:none;font-weight:500}
+    .back-link a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <header>
+    <div style="text-align:center;padding:8px 16px;">
+      <h1 style="margin:0;font-size:1.3em;font-weight:700;color:#fff;">FintechApp</h1>
+    </div>
+  </header>
+
+  <main>
+    <div class="section-card">
+      <h1>Basic Information</h1>
+      <div id="message"></div>
+
+      <form id="profileForm" class="profile-form">
+        <div>
+          <label>Full Name
+            <input type="text" id="fullname" name="fullname" placeholder="John Doe" required>
+          </label>
+        </div>
+        <div>
+          <label>Email Address
+            <input type="email" id="email" name="email" placeholder="your@email.com" required>
+          </label>
+        </div>
+        <div>
+          <label>Phone Number
+            <input type="tel" id="phone" name="phone" placeholder="+919876543210" required>
+          </label>
+        </div>
+        <button type="submit">Save Profile</button>
+      </form>
+
+      <div class="back-link">
+        <a href="./profile.html">← Back to Profile</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const messageDiv = document.getElementById('message');
+
+    const normalizeIndianPhone = (phone) => {
+      const cleaned = String(phone || '').replace(/\D/g, '');
+      const tenDigit = cleaned.length === 12 && cleaned.startsWith('91') ? cleaned.slice(2) : cleaned;
+      return /^[6-9]\d{9}$/.test(tenDigit) ? tenDigit : null;
+    };
+
+    const showMessage = (text, type) => {
+      messageDiv.textContent = text;
+      messageDiv.className = type;
+      messageDiv.style.display = 'block';
+    };
+
+    async function loadProfile() {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        try {
+          const response = await fetch(`/api/auth/profile/${encodeURIComponent(userId)}`);
+          const data = await response.json();
+          if (response.ok && data.user) {
+            document.getElementById('fullname').value = data.user.fullname || '';
+            document.getElementById('email').value = data.user.email || '';
+            document.getElementById('phone').value = data.user.phone || '';
+            localStorage.setItem('fullname', data.user.fullname || '');
+            localStorage.setItem('email', data.user.email || '');
+            localStorage.setItem('phone', data.user.phone || '');
+            return;
+          }
+        } catch (err) {
+          console.error('Profile load from API failed:', err);
+        }
+      }
+
+      document.getElementById('fullname').value = localStorage.getItem('fullname') || 'User';
+      document.getElementById('email').value = localStorage.getItem('email') || '';
+      document.getElementById('phone').value = localStorage.getItem('phone') || '';
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      showMessage('Saving profile...', 'info');
+
+      const fullname = document.getElementById('fullname').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phoneInput = document.getElementById('phone').value.trim();
+      const userId = localStorage.getItem('userId');
+
+      if (!fullname || fullname.length < 3) {
+        showMessage('Full name must be at least 3 characters', 'error');
+        return;
+      }
+
+      const normalized = normalizeIndianPhone(phoneInput);
+      if (!normalized) {
+        showMessage('Invalid Indian phone number. Must be 10 digits starting with 6-9', 'error');
+        return;
+      }
+
+      const phone = `+91${normalized}`;
+
+      if (userId) {
+        try {
+          const response = await fetch(`/api/auth/profile/${encodeURIComponent(userId)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fullname, email, phone })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            showMessage(data.error || 'Failed to update profile', 'error');
+            return;
+          }
+
+          const updated = data.user || {};
+          document.getElementById('fullname').value = updated.fullname || fullname;
+          document.getElementById('email').value = updated.email || email;
+          document.getElementById('phone').value = updated.phone || phone;
+
+          localStorage.setItem('fullname', updated.fullname || fullname);
+          localStorage.setItem('email', updated.email || email);
+          localStorage.setItem('phone', updated.phone || phone);
+          showMessage('Profile saved successfully!', 'success');
+          return;
+        } catch (err) {
+          showMessage('Failed to update profile. Please try again.', 'error');
+          return;
+        }
+      }
+
+      localStorage.setItem('fullname', fullname);
+      localStorage.setItem('email', email);
+      localStorage.setItem('phone', phone);
+      showMessage('Profile saved successfully!', 'success');
+    });
+
+    loadProfile();
+  </script>
+</body>
+</html>

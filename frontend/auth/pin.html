@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Setup PIN — FintechApp</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .pin-container{max-width:450px;margin:40px auto;background:#fff;padding:40px;border-radius:12px;box-shadow:0 20px 25px rgba(0,0,0,0.1)}
+    .pin-header{text-align:center;margin-bottom:32px}
+    .pin-header h1{color:#b000b2;font-size:1.8em;margin:0 0 8px}
+    .pin-header p{color:#6B7280;margin:0}
+    #message{padding:12px;margin-bottom:16px;border-radius:8px;display:none}
+    #message.success{background:#D1FAE5;color:#10B981;border-left:4px solid #10B981;display:block}
+    #message.error{background:#FEE2E2;color:#EF4444;border-left:4px solid #EF4444;display:block}
+    #message.info{background:#DBEAFE;color:#3B82F6;border-left:4px solid #3B82F6;display:block}
+    .form-group{margin-bottom:20px}
+    .form-group label{color:#1F2937;display:block;margin:12px 0 6px;font-weight:500}
+    .form-group input{background:#ffffff !important;border:2px solid #e5e7eb !important;color:#1F2937 !important;padding:12px !important;border-radius:8px !important;font-size:0.95em !important;width:100% !important}
+    .form-group input::placeholder{color:#888888 !important}
+    .form-group input:focus{outline:none !important;border-color:#b000b2 !important;box-shadow:0 0 0 3px rgba(176, 0, 178, 0.1) !important}
+    .back-link{text-align:center;margin-top:24px}
+    .back-link a{color:#b000b2;text-decoration:none;font-weight:500}
+    .back-link a:hover{text-decoration:underline}
+    .pin-container button{background:linear-gradient(135deg, #b000b2 0%, #93009c 100%) !important;color:#fff !important;border:none !important;padding:12px !important;margin-top:12px !important;border-radius:8px !important;font-weight:600 !important;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 6px rgba(176, 0, 178, 0.2)}
+    .pin-container button:hover{transform:translateY(-2px);box-shadow:0 6px 12px rgba(124, 58, 237, 0.3)}
+    .pin-container input[type="password"]{background:#fff !important;color:#1F2937 !important;border:2px solid #E5E7EB !important}
+    .pin-container input[type="password"]:focus{border-color:#b000b2 !important;box-shadow:0 0 0 3px rgba(176, 0, 178, 0.1) !important}
+    .password-wrapper{position:relative;display:flex;align-items:center}
+    .password-wrapper input{flex:1;padding-right:45px !important}
+    .eye-icon{position:absolute;right:5px;background:none;border:none;cursor:pointer;color:#888888;font-size:1.2em;padding:6px 8px;display:flex;align-items:center;justify-content:center;width:auto;height:auto}
+    .eye-icon:hover{color:#b000b2}
+  </style>
+</head>
+<body>
+  <header>
+    <div style="text-align:center;padding:8px 16px;">
+      <h1 style="margin:0;font-size:1.3em;font-weight:700;color:#fff;">FintechApp</h1>
+    </div>
+  </header>
+
+  <div class="pin-container" style="margin-top: 40px;">
+    <div class="pin-header">
+      <h1>Set Transaction PIN</h1>
+      <p>Secure your transactions with a 4-digit PIN</p>
+    </div>
+
+    <div id="message"></div>
+
+    <form id="pinForm">
+      <div class="form-group">
+        <label>User Identifier
+          <input type="text" id="userId" name="id" readonly style="background:#f5f5f5 !important;cursor:not-allowed !important;">
+        </label>
+        <small style="color:#6B7280">Using your account ID/email/phone from current session</small>
+      </div>
+      <div class="form-group">
+        <label>Enter 4-Digit PIN
+          <div class="password-wrapper">
+            <input type="password" id="pinInput" name="pin" maxlength="4" minlength="4" placeholder="0000" required pattern="[0-9]{4}">
+            <button type="button" class="eye-icon" id="togglePin" onclick="togglePinVisibility()">
+              <svg id="pinEyeIcon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </label>
+        <small style="color:#6B7280">Use numbers only (0-9)</small>
+      </div>
+      <button type="submit">Set PIN</button>
+    </form>
+
+    <div class="back-link">
+      <a href="login.html">← Back to Login</a>
+    </div>
+  </div>
+
+  <script>
+    // Toggle PIN visibility
+    function togglePinVisibility() {
+      const pinInput = document.getElementById('pinInput');
+      const pinEyeIcon = document.getElementById('pinEyeIcon');
+      
+      if (pinInput.type === 'password') {
+        pinInput.type = 'text';
+        pinEyeIcon.setAttribute('stroke-width', '1.5');
+      } else {
+        pinInput.type = 'password';
+        pinEyeIcon.setAttribute('stroke-width', '2');
+      }
+    }
+
+    const form = document.getElementById('pinForm');
+    const messageDiv = document.getElementById('message');
+    const userIdInput = document.getElementById('userId');
+
+    // Pre-fill user identifier from localStorage
+    window.addEventListener('DOMContentLoaded', () => {
+      const userId = localStorage.getItem('userId');
+      const email = localStorage.getItem('email');
+      const phone = localStorage.getItem('phone');
+      const identifier = userId || email || phone;
+
+      if (identifier) {
+        userIdInput.value = identifier;
+      } else {
+        messageDiv.textContent = 'Account identifier not found. Please login again.';
+        messageDiv.className = 'error';
+        messageDiv.style.display = 'block';
+        setTimeout(() => window.location.href = '/auth/login.html', 2000);
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = userIdInput.value;
+      const pin = document.getElementById('pinInput').value;
+      
+      if (!id) {
+        messageDiv.textContent = 'User ID not found. Please login again.';
+        messageDiv.className = 'error';
+        messageDiv.style.display = 'block';
+        return;
+      }
+      
+      if (!pin || pin.length !== 4 || !/^[0-9]{4}$/.test(pin)) {
+        messageDiv.textContent = 'PIN must be exactly 4 digits (0-9)';
+        messageDiv.className = 'error';
+        messageDiv.style.display = 'block';
+        return;
+      }
+
+      messageDiv.textContent = 'Setting PIN...';
+      messageDiv.className = 'info';
+      messageDiv.style.display = 'block';
+
+      try {
+        const response = await fetch('/api/auth/set-pin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, pin })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          messageDiv.textContent = 'PIN set successfully! Redirecting...';
+          messageDiv.className = 'success';
+          localStorage.setItem('pinSet', 'true');
+          setTimeout(() => window.location.href = '/profile/profile.html', 1500);
+        } else {
+          messageDiv.textContent = '' + (data.error || 'Failed to set PIN');
+          messageDiv.className = 'error';
+          messageDiv.style.display = 'block';
+        }
+      } catch (err) {
+        messageDiv.textContent = '' + err.message;
+        messageDiv.className = 'error';
+        messageDiv.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

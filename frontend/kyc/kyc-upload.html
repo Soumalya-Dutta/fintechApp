@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KYC Upload — FintechApp</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .status-badge { padding: 8px 12px; border-radius: 4px; font-weight: bold; margin-top: 10px; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-verified { background: #d4edda; color: #155724; }
+    .status-rejected { background: #f8d7da; color: #721c24; }
+    label{color:#ffffff !important;display:block !important;margin:12px 0 6px !important;font-weight:500 !important}
+    input[type="text"], input[type="file"]{background:#2a2a2a !important;border:2px solid #380356 !important;color:#ffffff !important;padding:12px !important;border-radius:8px !important;font-size:0.95em !important;width:100% !important}
+    input[type="text"]::placeholder{color:#888888 !important}
+    input[type="text"]:focus, input[type="file"]:focus{outline:none !important;border-color:#b000b2 !important;box-shadow:0 0 0 3px rgba(176, 0, 178, 0.1) !important}
+  </style>
+</head>
+<body>
+  <header>
+    <div style="text-align:center;padding:8px 16px;">
+      <h1 style="margin:0;font-size:1.3em;font-weight:700;color:#fff;">FintechApp</h1>
+    </div>
+  </header>
+  <main class="card" style="margin-top: 40px;">
+    <h2>KYC Verification</h2>
+    <div id="message"></div>
+    
+    <form id="kycForm" enctype="multipart/form-data">
+      <label>User ID
+        <input type="text" name="userId" id="userId" placeholder="user id" required>
+      </label>
+      <label>Aadhaar number
+        <input type="text" name="aadhaar" placeholder="12-digit aadhaar">
+      </label>
+      <label>Aadhaar document (front/back)
+        <input type="file" name="aadhaar_doc" accept="image/*,application/pdf">
+      </label>
+      <label>PAN number
+        <input type="text" name="pan" placeholder="PAN number">
+      </label>
+      <label>PAN card image
+        <input type="file" name="pan_doc" accept="image/*,application/pdf">
+      </label>
+      <label>Other ID
+        <input type="file" name="other_id" accept="image/*,application/pdf">
+      </label>
+      <button type="submit">Upload for verification</button>
+    </form>
+
+    <section>
+      <h4>Your KYC Status</h4>
+      <div id="statusDiv">Loading status...</div>
+    </section>
+
+    <p style="margin-top: 20px;"><a href="../profile/profile.html">Back to Profile</a></p>
+  </main>
+
+  <script>
+    const form = document.getElementById('kycForm');
+    const messageDiv = document.getElementById('message');
+    const statusDiv = document.getElementById('statusDiv');
+    const userIdInput = document.getElementById('userId');
+
+    // Load user ID from localStorage
+    function loadUserId() {
+      const userId = localStorage.getItem('userId') || 'user_' + Date.now();
+      userIdInput.value = userId;
+    }
+
+    // Load KYC status
+    async function loadKYCStatus() {
+      try {
+        const userId = localStorage.getItem('userId') || 'user_' + Date.now();
+        const response = await fetch(`/api/kyc/${userId}/status`);
+        const data = await response.json();
+        
+        if (data.status && data.status !== 'not_submitted') {
+          const statusClass = `status-${data.status}`;
+          statusDiv.innerHTML = `
+            <div class="${statusClass}">
+              Status: ${data.status.toUpperCase()}
+            </div>
+            <p>Last updated: ${new Date(data.record?.createdAt).toLocaleDateString()}</p>
+          `;
+        } else {
+          statusDiv.innerHTML = '<p>No KYC submitted yet</p>';
+        }
+      } catch (err) {
+        statusDiv.innerHTML = '<p>Could not load KYC status</p>';
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      messageDiv.textContent = 'Uploading KYC documents...';
+      messageDiv.style.color = 'blue';
+
+      const formData = new FormData(form);
+      try {
+        const response = await fetch('/api/kyc/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        if (response.ok) {
+          messageDiv.textContent = 'KYC uploaded successfully! Status: ' + data.record.status;
+          messageDiv.style.color = 'green';
+          form.reset();
+          loadUserId();
+          loadKYCStatus();
+        } else {
+          messageDiv.textContent = ' ' + (data.error || 'Upload failed');
+          messageDiv.style.color = 'red';
+        }
+      } catch (err) {
+        messageDiv.textContent = ' Error: ' + err.message;
+        messageDiv.style.color = 'red';
+      }
+    });
+
+    loadUserId();
+    loadKYCStatus();
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Runtime
+uploads/
+*.o
+*.exe
+*.dll
+
+# Build
+dist/
+build/
+.next/
+.nuxt/
+
+# Misc
+.cache/
+.temp/
+temp/

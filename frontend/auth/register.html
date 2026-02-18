@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register — FintechApp</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .register-container{max-width:450px;margin:40px auto;background:#fff;padding:40px;border-radius:12px;box-shadow:0 20px 25px rgba(0,0,0,0.1)}
+    .register-header{text-align:center;margin-bottom:32px}
+    .register-header h1{color:#b000b2;font-size:2em;margin:0 0 8px}
+    .register-header p{color:#6B7280;margin:0}
+    #message{padding:12px;margin-bottom:16px;border-radius:8px;display:none}
+    #message.success{background:#D1FAE5;color:#10B981;border-left:4px solid #10B981;display:block}
+    #message.error{background:#FEE2E2;color:#EF4444;border-left:4px solid #EF4444;display:block}
+    #message.info{background:#DBEAFE;color:#3B82F6;border-left:4px solid #3B82F6;display:block}
+    .form-group{margin-bottom:20px}
+    .form-group label{color:#1F2937;display:block;margin:12px 0 6px;font-weight:500}
+    .form-group input{background:#ffffff !important;border:2px solid #e5e7eb !important;color:#1F2937 !important;padding:12px !important;border-radius:8px !important;font-size:0.95em !important;width:100% !important}
+    .form-group input::placeholder{color:#888888 !important}
+    .form-group input:focus{outline:none !important;border-color:#b000b2 !important;box-shadow:0 0 0 3px rgba(176, 0, 178, 0.1) !important}
+    .password-wrapper{position:relative;display:flex;align-items:center}
+    .password-wrapper input{flex:1;padding-right:45px !important}
+    .eye-icon{position:absolute;right:5px;background:none;border:none;cursor:pointer;color:#888888;font-size:1.2em;padding:6px 8px;display:flex;align-items:center;justify-content:center;width:auto;height:auto}
+    .eye-icon:hover{color:#b000b2}
+    .login-link{text-align:center;margin-top:24px;color:#6B7280}
+    .login-link a{color:#b000b2;text-decoration:none;font-weight:600}
+    .login-link a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <header>
+    <div style="text-align:center;padding:8px 16px;">
+      <h1 style="margin:0;font-size:1.3em;font-weight:700;color:#fff;">FintechApp</h1>
+    </div>
+  </header>
+
+  <div class="register-container" style="margin-top: 40px;">
+    <div class="register-header">
+      <h1>Create Account</h1>
+      <p>Join FintechApp for secure financial services</p>
+    </div>
+
+    <div id="message"></div>
+
+    <form id="registerForm">
+      <div class="form-group">
+        <label>Full Name
+          <input type="text" name="fullname" placeholder="John Doe" required>
+        </label>
+      </div>
+      <div class="form-group">
+        <label>Email Address
+          <input type="email" name="email" placeholder="your@email.com" required>
+        </label>
+      </div>
+      <div class="form-group">
+        <label>Phone Number
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <input type="text" value="+91" readonly style="flex:0 0 70px;background:#f0f0f0 !important;cursor:not-allowed !important;">
+            <input type="tel" name="phone" placeholder="9876543210" maxlength="10" pattern="[0-9]{10}">
+          </div>
+          <small style="display:block;margin-top:4px;color:#6B7280">Enter 10-digit mobile number</small>
+        </label>
+      </div>
+      <div class="form-group">
+        <label>Password
+          <div class="password-wrapper">
+            <input type="password" id="passwordInput" name="password" placeholder="Create a strong password" required>
+            <button type="button" class="eye-icon" id="togglePassword" onclick="togglePasswordVisibility()">
+              <svg id="eyeIcon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </label>
+      </div>
+      <button type="submit">Create Account</button>
+    </form>
+
+    <div class="login-link">
+      Already have an account? <a href="login.html">Sign In</a>
+    </div>
+  </div>
+
+  <script>
+    // Toggle password visibility
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('passwordInput');
+      const eyeIcon = document.getElementById('eyeIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.setAttribute('stroke-width', '1.5');
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.setAttribute('stroke-width', '2');
+      }
+    }
+
+    const form = document.getElementById('registerForm');
+    const messageDiv = document.getElementById('message');
+
+    // Email validation
+    const validateEmail = (email) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    };
+
+    // Indian phone number validation (10 digits, starts with 6-9)
+    const validateIndianPhone = (phone) => {
+      const cleaned = phone.replace(/\D/g, '');
+      const normalized = cleaned.length === 12 && cleaned.startsWith('91') ? cleaned.slice(2) : cleaned;
+      const phoneRegex = /^[6-9]\d{9}$/;
+      return phoneRegex.test(normalized);
+    };
+
+    // Password validation (minimum 6 characters, with uppercase, lowercase, and numeric)
+    const validatePassword = (password) => {
+      if (!password || password.length < 6) {
+        return { valid: false, error: 'Password must be at least 6 characters long' };
+      }
+      if (!/[A-Z]/.test(password)) {
+        return { valid: false, error: 'Password must contain at least one uppercase letter (A-Z)' };
+      }
+      if (!/[a-z]/.test(password)) {
+        return { valid: false, error: 'Password must contain at least one lowercase letter (a-z)' };
+      }
+      if (!/\d/.test(password)) {
+        return { valid: false, error: 'Password must contain at least one numeric digit (0-9)' };
+      }
+      return { valid: true };
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const fullname = form.querySelector('input[name="fullname"]').value.trim();
+      const email = form.querySelector('input[name="email"]').value.trim();
+      const phone = form.querySelector('input[name="phone"]').value.trim();
+      const password = document.getElementById('passwordInput').value;
+
+      // Validate full name
+      if (!fullname || fullname.length < 3) {
+        messageDiv.textContent = ' Full name must be at least 3 characters';
+        messageDiv.className = 'error';
+        messageDiv.style.display = 'block';
+        return;
+      }
+
+      // Validate email
+      if (email && !validateEmail(email)) {
+        messageDiv.textContent = ' Invalid email format';
+        messageDiv.className = 'error';
+        messageDiv.style.display = 'block';
+        return;
+      }
+
+      // Validate phone
+      if (phone && !validateIndianPhone(phone)) {
+        messageDiv.textContent = ' Invalid Indian phone number. Must be 10 digits starting with 6-9';
+        messageDiv.className = 'error';
+        messageDiv.style.display = 'block';
+        return;
+      }
+
+      // Validate password
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        messageDiv.textContent = ' ' + passwordValidation.error;
+        messageDiv.className = 'error';
+        messageDiv.style.display = 'block';
+        return;
+      }
+
+      messageDiv.textContent = 'Registering...';
+      messageDiv.className = 'info';
+      messageDiv.style.display = 'block';
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fullname, email, phone: phone ? '+91' + phone : '', password })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          messageDiv.textContent = '✓ Registration successful! Redirecting...';
+          messageDiv.className = 'success';
+          // Save user info
+          localStorage.setItem('email', email);
+          localStorage.setItem('phone', phone ? '+91' + phone : '');
+          localStorage.setItem('fullname', fullname);
+          localStorage.setItem('userId', data.user?.id || 'user_' + Date.now());
+          setTimeout(() => window.location.href = '/auth/pin.html', 1500);
+        } else {
+          messageDiv.textContent = '✗ ' + (data.error || 'Registration failed');
+          messageDiv.className = 'error';
+        }
+      } catch (err) {
+        messageDiv.textContent = '✗ Error: ' + err.message;
+        messageDiv.className = 'error';
+      }
+    });
+  </script>
+</body>
+</html>

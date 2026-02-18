@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Merchant Dashboard — FintechApp</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .dashboard-hero{background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);color:#fff;padding:30px;border-radius:12px;margin-bottom:24px;text-align:center}
+    .dashboard-hero h1{color:#fff;margin:0 0 8px}
+    .dashboard-hero p{margin:0;color:rgba(255,255,255,0.9)}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
+    .stat-box{background:#1a1a1a;padding:20px;border-radius:10px;border-left:4px solid #b000b2;box-shadow:var(--shadow)}
+    .stat-box h4{margin:0 0 8px;color:#aaaaaa;font-size:0.9em;text-transform:uppercase}
+    .stat-box .number{font-size:2.5em;font-weight:700;color:#b000b2}
+    .merchant-card{background:linear-gradient(135deg, #b000b2 0%, #93009c 100%);color:#fff;padding:24px;border-radius:12px;margin-bottom:24px;box-shadow:var(--shadow-lg)}
+    .merchant-card h2{color:#fff;margin:0 0 16px}
+    .merchant-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+    .info-item{background:rgba(255,255,255,0.15);padding:12px;border-radius:8px}
+    .info-label{color:rgba(255,255,255,0.8);font-size:0.9em;margin-bottom:4px}
+    .info-value{font-size:1.1em;font-weight:600;color:#fff;font-family:monospace;word-break:break-all}
+    .payments-section{background:#1a1a1a;padding:24px;border-radius:12px;margin-bottom:24px;box-shadow:var(--shadow)}
+    .payments-section h2{color:#b000b2;margin-top:0;border-bottom:2px solid #380356;padding-bottom:12px}
+    .table{width:100%;border-collapse:collapse}
+    .table th{background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);color:#fff;padding:12px;text-align:left}
+    .table td{padding:12px;border-bottom:1px solid #E5E7EB}
+    .table tr:hover{background:#2a2a2a}
+    .action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+    .action-btn{padding:12px 16px;border-radius:8px;text-decoration:none;text-align:center;font-weight:600;transition:all 0.3s;border:none;cursor:pointer}
+    .action-btn.primary{background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);color:#fff}
+    .action-btn.primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+    .action-btn.secondary{background:linear-gradient(135deg, #380356 0%, #6b0078 100%);color:#fff}
+    .action-btn.secondary:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+    .action-btn.danger{background:linear-gradient(135deg, #EF4444 0%, #DC2626 100%);color:#fff}
+  </style>
+</head>
+<body>
+  <header>
+    <div style="text-align:center;padding:8px 16px;">
+      <h1 style="margin:0;font-size:1.3em;font-weight:700;color:#fff;">FintechApp</h1>
+    </div>
+  </header>
+
+  <main style="margin-top: 40px;">
+    <div class="dashboard-hero">
+      <h1>Merchant Dashboard</h1>
+      <p>Manage your payments and business operations</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <h4>Total Earnings</h4>
+        <div class="number">₹ 45,890</div>
+      </div>
+      <div class="stat-box">
+        <h4>Transactions Today</h4>
+        <div class="number" id="txnCount">12</div>
+      </div>
+      <div class="stat-box">
+        <h4>Active Customers</h4>
+        <div class="number">328</div>
+      </div>
+      <div class="stat-box">
+        <h4>Settlement Status</h4>
+        <div class="number" style="color:#10B981">Active</div>
+      </div>
+    </div>
+
+    <div class="merchant-card">
+      <h2>Your Merchant Profile</h2>
+      <div class="merchant-info">
+        <div class="info-item">
+          <div class="info-label">Business Name</div>
+          <div class="info-value" id="merchantNameDisplay">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Contact Number</div>
+          <div class="info-value" id="merchantPhoneDisplay">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Your UPI ID</div>
+          <div class="info-value" id="merchantUPIDisplay">-</div>
+        </div>
+      </div>
+      <p style="margin:16px 0 0;font-size:0.95em;color:rgba(255,255,255,0.9)">Share your UPI ID with customers to receive payments instantly</p>
+    </div>
+
+    <div class="payments-section">
+      <h2>Recent Payments Received</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Transaction ID</th>
+            <th>Customer</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Date & Time</th>
+          </tr>
+        </thead>
+        <tbody id="paymentsBody">
+          <tr><td colspan="5" style="text-align:center;padding:20px;">Loading payments...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <h2 style="color:#1F2937;margin-bottom:16px">Quick Actions</h2>
+      <div class="action-grid">
+        <a href="qr-generation.html" class="action-btn primary">Generate UPI QR</a>
+        <a href="merchant-onboarding.html" class="action-btn secondary">Add New Merchant</a>
+        <a href="../transfers/transfer.html" class="action-btn secondary">Send Payment</a>
+        <a href="../profile/profile.html" class="action-btn secondary">My Profile</a>
+        <a href="../index.html" class="action-btn danger">Back to Home</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <small>Secure merchant operations | <a href="#" style="color:#b000b2;text-decoration:none">Privacy</a> | <a href="#" style="color:#b000b2;text-decoration:none">Terms</a></small>
+  </footer>
+
+  <script>
+    const paymentsBody = document.getElementById('paymentsBody');
+    const merchantNameDisplay = document.getElementById('merchantNameDisplay');
+    const merchantPhoneDisplay = document.getElementById('merchantPhoneDisplay');
+    const merchantUPIDisplay = document.getElementById('merchantUPIDisplay');
+
+    // Load merchant info from localStorage
+    function loadMerchantInfo() {
+      const merchantName = localStorage.getItem('merchantName') || 'Not set';
+      const merchantPhone = localStorage.getItem('merchantPhone') || '-';
+      const merchantUPI = localStorage.getItem('merchantUPI') || 'Not set';
+      
+      merchantNameDisplay.textContent = merchantName;
+      merchantPhoneDisplay.textContent = merchantPhone;
+      merchantUPIDisplay.textContent = merchantUPI;
+    }
+
+    // Load merchant payments
+    async function loadPayments() {
+      try {
+        const merchantId = localStorage.getItem('merchantId') || 'merchant_' + Date.now();
+        const response = await fetch(`/api/merchant/${merchantId}/payments`);
+        const data = await response.json();
+        if (data.ok && data.payments.length > 0) {
+          paymentsBody.innerHTML = data.payments.map(p => `
+            <tr>
+              <td>${p.id}</td>
+              <td>${p.from || '-'}</td>
+              <td>₹${parseFloat(p.amount).toFixed(2)}</td>
+              <td class="${p.status}">${p.status.toUpperCase()}</td>
+              <td>${new Date(p.date).toLocaleDateString()}</td>
+            </tr>
+          `).join('');
+        } else {
+          paymentsBody.innerHTML = '<tr><td colspan="5">No payments received yet</td></tr>';
+        }
+      } catch (err) {
+        paymentsBody.innerHTML = '<tr><td colspan="5">Error loading payments</td></tr>';
+      }
+    }
+
+    loadMerchantInfo();
+    loadPayments();
+  </script>
+</body>
+</html>

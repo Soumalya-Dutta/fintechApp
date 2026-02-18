@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fund Transfer — FintechApp</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+  <style>
+    .transfer-hero{background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);color:#fff;padding:30px;border-radius:12px;margin-bottom:24px;text-align:center}
+    .transfer-hero h1{color:#fff;margin:0 0 8px}
+    .transfer-hero p{margin:0;color:rgba(255,255,255,0.9)}
+    .tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid #380356;background:#1a1a1a;border-radius:12px 12px 0 0;overflow:hidden;box-shadow:var(--shadow)}
+    .tab-btn{padding:16px 24px;background:transparent;border:none;cursor:pointer;font-size:1em;font-weight:600;color:#aaaaaa;border-bottom:3px solid transparent;transition:all 0.3s;flex:1;text-align:center}
+    .tab-btn:hover{color:#b000b2;background:#2a2a2a}
+    .tab-btn.active{color:#fff;background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);border-bottom-color:#b000b2}
+    .tab-content{display:none;background:#1a1a1a;padding:24px;border-radius:0 0 12px 12px;box-shadow:var(--shadow)}
+    .tab-content.active{display:block}
+    .transfer-form{display:grid;gap:16px}
+    .form-label{color:#aaaaaa;font-weight:600;margin-bottom:6px}
+    .transfer-form label{display:block;color:#ffffff;margin:12px 0 6px;font-weight:500}
+    .transfer-form label input{background:#2a2a2a !important;border:2px solid #380356 !important;padding:12px !important;border-radius:8px !important;font-size:0.95em !important;color:#ffffff !important;width:100% !important}
+    .transfer-form label input::placeholder{color:#888888 !important}
+    .transfer-form label input:focus{outline:none !important;border-color:#b000b2 !important;box-shadow:0 0 0 3px rgba(176, 0, 178, 0.1) !important}
+    .transfer-form button{background:linear-gradient(135deg, #93009c 0%, #6b0078 100%);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.3s;margin-top:8px}
+    .transfer-form button:hover{transform:translateY(-2px);box-shadow:0 6px 12px rgba(147, 0, 156, 0.3)}
+    .upi-display{background:#2a2a2a;padding:12px;border-radius:8px;margin:12px 0;font-size:0.9em;border-left:4px solid #b000b2;color:#aaaaaa}
+    #message{padding:12px;margin-bottom:16px;border-radius:8px;display:none}
+    #message.success{background:#D1FAE5;color:#10B981;border-left:4px solid #10B981;display:block}
+    #message.error{background:#FEE2E2;color:#EF4444;border-left:4px solid #EF4444;display:block}
+    #message.info{background:#DBEAFE;color:#3B82F6;border-left:4px solid #3B82F6;display:block}
+    .recent-section{background:#1a1a1a;padding:24px;border-radius:12px;margin-top:24px;box-shadow:var(--shadow)}
+    .recent-section h2{color:#b000b2;margin-top:0;border-bottom:2px solid #380356;padding-bottom:12px}
+    #transfersList{list-style:none;padding:0}
+    #transfersList li{padding:12px;border-bottom:1px solid #380356;color:#aaaaaa}
+    #transfersList li:hover{background:#2a2a2a}
+    #transfersList li:last-child{border-bottom:none}
+    .nav-link{display:inline-block;padding:10px 16px;background:#93009c;color:#fff;text-decoration:none;border-radius:8px;font-weight:500;margin-top:20px;transition:all 0.3s}
+    .nav-link:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  </style>
+</head>
+<body>
+  <header>
+    <div style="text-align:center;padding:8px 16px;">
+      <h1 style="margin:0;font-size:1.3em;font-weight:700;color:#fff;">FintechApp</h1>
+    </div>
+  </header>
+
+  <main style="margin-top: 40px;">
+    <div class="transfer-hero">
+      <h1>Fund Transfer</h1>
+      <p>Send money via wallet, bank, or UPI</p>
+    </div>
+
+    <div id="message"></div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('wallet')">Wallet Transfer</button>
+      <button class="tab-btn" onclick="switchTab('bank')">Bank Transfer</button>
+      <button class="tab-btn" onclick="switchTab('upi')">UPI Transfer</button>
+    </div>
+
+    <!-- Wallet Transfer Tab -->
+    <section id="wallet" class="tab-content active">
+      <h3 style="color:#b000b2;margin-top:0">Wallet-to-Wallet Transfer</h3>
+      <form id="walletForm" class="transfer-form">
+        <div>
+          <label class="form-label">Your User ID
+            <input type="text" name="from" placeholder="your user id" required>
+          </label>
+        </div>
+        <div>
+          <label class="form-label">Recipient ID
+            <input type="text" name="to" placeholder="recipient id" required>
+          </label>
+        </div>
+        <div>
+          <label class="form-label">Amount (₹)
+            <input type="number" name="amount" step="0.01" min="0" required>
+          </label>
+        </div>
+        <button type="submit">Send Money</button>
+      </form>
+    </section>
+
+    <!-- Bank Transfer Tab -->
+    <section id="bank" class="tab-content">
+      <h3 style="color:#b000b2;margin-top:0">Bank Account Transfer</h3>
+      <form id="bankForm" class="transfer-form">
+        <div>
+          <label class="form-label">Your User ID
+            <input type="text" name="from" placeholder="your user id" required>
+          </label>
+        </div>
+        <div>
+          <label class="form-label">Account Number
+            <input type="text" name="account" placeholder="16-digit account number" required>
+          </label>
+        </div>
+        <div>
+          <label class="form-label">IFSC Code
+            <input type="text" name="ifsc" placeholder="e.g., SBIN0001234" required>
+          </label>
+        </div>
+        <div>
+          <label class="form-label">Amount (₹)
+            <input type="number" name="amount" step="0.01" min="0" required>
+          </label>
+        </div>
+        <button type="submit">Initiate Bank Transfer</button>
+      </form>
+    </section>
+
+    <!-- UPI Transfer Tab -->
+    <section id="upi" class="tab-content">
+      <h3 style="color:#b000b2;margin-top:0">UPI Payment Transfer</h3>
+      <form id="upiForm" class="transfer-form">
+        <div>
+          <label class="form-label">Your User ID
+            <input type="text" name="from" placeholder="your user id" required>
+          </label>
+        </div>
+        <div>
+          <label class="form-label">UPI ID (Merchant)
+            <input type="text" id="upiReceiver" name="upi_id" placeholder="merchant@fintech" required>
+          </label>
+          <div class="upi-display" id="savedUPIDisplay" style="display:none;"></div>
+        </div>
+        <div>
+          <label class="form-label">Amount (₹)
+            <input type="number" name="amount" step="0.01" min="1" required>
+          </label>
+        </div>
+        <button type="submit">Send via UPI</button>
+      </form>
+      <div style="margin-top:24px;padding:16px;background:#2a2a2a;border-radius:8px;border-left:4px solid #b000b2">
+        <strong style="color:#b000b2;display:block;margin-bottom:12px">Saved Merchants</strong>
+        <div id="savedMerchants" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px"></div>
+      </div>
+    </section>
+
+    <!-- Recent Transfers -->
+    <div class="recent-section">
+      <h2>Recent Transfers</h2>
+      <ul id="transfersList">
+        <li style="text-align:center;color:#9CA3AF;padding:20px;">Loading transfers...</li>
+      </ul>
+    </div>
+
+    <a href="../profile/profile.html" class="nav-link">My Profile</a>
+    <a href="../index.html" class="nav-link">Home</a>
+  </main>
+
+  <script>
+    const messageDiv = document.getElementById('message');
+    const walletForm = document.getElementById('walletForm');
+    const bankForm = document.getElementById('bankForm');
+    const upiForm = document.getElementById('upiForm');
+    const transfersList = document.getElementById('transfersList');
+    const upiReceiverInput = document.getElementById('upiReceiver');
+    const savedMerchantsDiv = document.getElementById('savedMerchants');
+
+    function getSenderId() {
+      return localStorage.getItem('userId') || localStorage.getItem('email') || '';
+    }
+
+    // Tab switching
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // Load saved merchants
+    function loadSavedMerchants() {
+      const merchantName = localStorage.getItem('merchantName');
+      const merchantUPI = localStorage.getItem('merchantUPI');
+      
+      if (merchantName && merchantUPI) {
+        upiReceiverInput.value = merchantUPI;
+        const savedUPIDisplay = document.getElementById('savedUPIDisplay');
+        savedUPIDisplay.innerHTML = `<strong>${merchantName}</strong> (${merchantUPI})`;
+        savedUPIDisplay.style.display = 'block';
+        
+        savedMerchantsDiv.innerHTML = `
+          <button type="button" class="tab-btn" onclick="useMerchantUPI('${merchantUPI}', '${merchantName}')" style="background: #f0f0f0; border: none; width: auto;">
+            ${merchantName} (${merchantUPI})
+          </button>
+        `;
+      }
+    }
+
+    function initSenderFields() {
+      const senderId = getSenderId();
+      if (!senderId) return;
+      walletForm.querySelector('input[name="from"]').value = senderId;
+      bankForm.querySelector('input[name="from"]').value = senderId;
+      upiForm.querySelector('input[name="from"]').value = senderId;
+    }
+
+    // Refresh wallet balance
+    async function refreshWalletBalance() {
+      try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) return;
+        const response = await fetch(`/api/wallet/balance?userId=${encodeURIComponent(userId)}`);
+        const data = await response.json();
+        if (data.ok) {
+          localStorage.setItem('walletBalance', parseFloat(data.balance).toFixed(2));
+          // Dispatch event so transactions.html can update
+          window.dispatchEvent(new Event('walletBalanceUpdated'));
+        }
+      } catch (err) {
+        console.log('Could not refresh balance:', err);
+      }
+    }
+
+    // Use saved merchant UPI
+    function useMerchantUPI(upi, name) {
+      upiReceiverInput.value = upi;
+      messageDiv.textContent = `✓ Selected: ${name}`;
+      messageDiv.style.color = 'green';
+      setTimeout(() => { messageDiv.textContent = ''; }, 2000);
+    }
+
+    // Wallet transfer
+    walletForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      messageDiv.textContent = 'Processing wallet transfer...';
+      messageDiv.style.color = 'blue';
+
+      const formData = new FormData(walletForm);
+      try {
+        const payload = Object.fromEntries(formData);
+        payload.from = payload.from || getSenderId();
+        const response = await fetch('/api/transfers/wallet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (response.ok) {
+          messageDiv.textContent = 'Transfer ' + data.txn.id + ' sent successfully!';
+          messageDiv.style.color = 'green';
+          walletForm.reset();
+          await refreshWalletBalance();
+          loadTransfers();
+        } else {
+          messageDiv.textContent = '✗ ' + (data.error || 'Transfer failed');
+          messageDiv.style.color = 'red';
+        }
+      } catch (err) {
+        messageDiv.textContent = '✗ Error: ' + err.message;
+        messageDiv.style.color = 'red';
+      }
+    });
+
+    // Bank transfer
+    bankForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      messageDiv.textContent = 'Initiating bank transfer...';
+      messageDiv.style.color = 'blue';
+
+      const formData = new FormData(bankForm);
+      try {
+        const payload = Object.fromEntries(formData);
+        payload.from = payload.from || getSenderId();
+        const response = await fetch('/api/transfers/bank', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (response.ok) {
+          messageDiv.textContent = 'Bank transfer ' + data.txn.id + ' initiated!';
+          messageDiv.style.color = 'green';
+          bankForm.reset();
+          await refreshWalletBalance();
+          loadTransfers();
+        } else {
+          messageDiv.textContent = '✗ ' + (data.error || 'Transfer failed');
+          messageDiv.style.color = 'red';
+        }
+      } catch (err) {
+        messageDiv.textContent = '✗ Error: ' + err.message;
+        messageDiv.style.color = 'red';
+      }
+    });
+
+    // UPI transfer
+    upiForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      messageDiv.textContent = 'Processing UPI transfer...';
+      messageDiv.style.color = 'blue';
+
+      const formData = new FormData(upiForm);
+      try {
+        const sender = formData.get('from') || getSenderId();
+        const response = await fetch('/api/transfers/wallet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: sender,
+            to: formData.get('upi_id'),
+            amount: formData.get('amount'),
+            method: 'upi'
+          })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          messageDiv.textContent = 'UPI transfer ' + data.txn.id + ' successful!';
+          messageDiv.style.color = 'green';
+          upiForm.reset();
+          await refreshWalletBalance();
+          loadSavedMerchants();
+          loadTransfers();
+        } else {
+          messageDiv.textContent = ' ' + (data.error || 'UPI transfer failed');
+          messageDiv.style.color = 'red';
+        }
+      } catch (err) {
+        messageDiv.textContent = '✗ Error: ' + err.message;
+        messageDiv.style.color = 'red';
+      }
+    });
+
+    // Load recent transfers
+    async function loadTransfers() {
+      try {
+        const response = await fetch('/api/transfers/history');
+        const data = await response.json();
+        if (data.ok && data.transactions.length > 0) {
+          transfersList.innerHTML = data.transactions.slice(0, 10).map(t => 
+            `<li style="padding: 10px; border-bottom: 1px solid #eee;">
+              <strong>${t.id}</strong> | ₹${parseFloat(t.amount).toFixed(2)} to ${t.to} 
+              <span style="color: ${t.status === 'success' ? 'green' : 'orange'};">${t.status.toUpperCase()}</span>
+              <br><small>${new Date(t.date).toLocaleString()}</small>
+            </li>`
+          ).join('');
+        } else {
+          transfersList.innerHTML = '<li style="padding: 10px; text-align: center; color: #999;">No transfers yet</li>';
+        }
+      } catch (err) {
+        transfersList.innerHTML = '<li style="padding: 10px; text-align: center; color: #999;">Error loading transfers</li>';
+      }
+    }
+
+    loadSavedMerchants();
+    initSenderFields();
+    loadTransfers();
+  </script>
+</body>
+</html>
