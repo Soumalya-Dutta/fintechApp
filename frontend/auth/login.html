@@ -103,18 +103,9 @@
 
     <form id="loginForm">
       <div class="form-group">
-        <label>Email Address
-          <input type="email" name="email" placeholder="your@email.com">
-        </label>
-      </div>
-      <div style="text-align:center;color:#aaaaaa;margin:16px 0;font-size:0.9em">OR</div>
-      <div class="form-group">
-        <label>Phone Number
-          <div style="display:flex;gap:8px;margin-top:6px;">
-            <input type="text" value="+91" readonly style="flex:0 0 70px;background:#2a2a2a !important;cursor:not-allowed !important;border:2px solid #380356 !important;">
-            <input type="tel" name="phone" placeholder="9876543210" maxlength="10" pattern="[0-9]{10}">
-          </div>
-          <small style="display:block;margin-top:4px;color:#888888">Enter 10-digit mobile number</small>
+        <label>Email Address / Phone Number
+          <input type="text" name="identifier" placeholder="your@email.com or +91 988346823" required>
+          <small style="display:block;margin-top:4px;color:#888888">Enter email or 10-digit mobile number</small>
         </label>
       </div>
       <div class="form-group">
@@ -175,26 +166,26 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = form.querySelector('input[name="email"]').value.trim();
-      const phone = form.querySelector('input[name="phone"]').value.trim();
+      const rawIdentifier = form.querySelector('input[name="identifier"]').value.trim();
       const password = document.getElementById('passwordInput').value;
 
       // Determine identifier
       let identifier = '';
-      if (email && !phone) {
-        identifier = email;
-      } else if (phone && !email) {
-        identifier = '+91' + phone;
-      } else if (email && phone) {
-        messageDiv.textContent = ' Please provide either email OR phone, not both';
+      if (!rawIdentifier) {
+        messageDiv.textContent = ' Please provide email or phone number';
         messageDiv.className = 'error';
         messageDiv.style.display = 'block';
         return;
+      }
+
+      if (rawIdentifier.includes('@')) {
+        identifier = rawIdentifier;
       } else {
-        messageDiv.textContent = ' Please provide either email or phone number';
-        messageDiv.className = 'error';
-        messageDiv.style.display = 'block';
-        return;
+        const digitsOnly = rawIdentifier.replace(/\D/g, '');
+        const normalizedPhone = digitsOnly.length === 12 && digitsOnly.startsWith('91')
+          ? digitsOnly.slice(2)
+          : digitsOnly;
+        identifier = '+91' + normalizedPhone;
       }
 
       // Validate identifier format
@@ -234,7 +225,7 @@
           localStorage.setItem('token', data.token);
           localStorage.setItem('userId', data.user?.id || localStorage.getItem('userId') || '');
           localStorage.setItem('email', data.user?.email || (isEmail ? identifier : ''));
-          localStorage.setItem('phone', data.user?.phone || (isPhone ? `+91${phone}` : localStorage.getItem('phone') || ''));
+          localStorage.setItem('phone', data.user?.phone || (isPhone ? identifier : localStorage.getItem('phone') || ''));
           localStorage.setItem('fullname', data.user?.fullname || localStorage.getItem('fullname') || '');
           setTimeout(() => window.location.href = '/profile/profile.html', 1500);
         } else {
